@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "api/index.py"
+    }
+  ],
+  "env": {
+    "XAI_API_KEY":                "@xai-api-key",
+    "GROK_MODEL":                 "grok-3-latest",
+    "SUPABASE_URL":               "@supabase-url",
+    "SUPABASE_SERVICE_ROLE_KEY":  "@supabase-service-role-key",
+    "STRIPE_SECRET_KEY":          "@stripe-secret-key",
+    "STRIPE_WEBHOOK_SECRET":      "@stripe-webhook-secret",
+    "STRIPE_PRICE_MONTHLY":       "@stripe-price-monthly",
+    "STRIPE_PRICE_YEARLY":        "@stripe-price-yearly",
+    "STRIPE_PRICE_LIFETIME":      "@stripe-price-lifetime",
+    "STRIPE_SUCCESS_URL":         "upquest://payment-success?session_id={CHECKOUT_SESSION_ID}",
+    "STRIPE_CANCEL_URL":          "upquest://payment-cancel",
+    "STRIPE_PORTAL_RETURN_URL":   "upquest://profile"
+  }
+}
