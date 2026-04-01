@@ -1,5 +1,5 @@
 """
-UpQuest â AI-Powered Health & Routine App
+UpQuest â AI-Powered Health \u0026 Routine App
 Backend: FastAPI (Python 3.12)
 LLM: xAI Grok API (OpenAI-compatible)
 DB/Auth/Storage: Supabase
@@ -66,22 +66,22 @@ def require_auth(authorization: str = Header(...)):
         raise HTTPException(status_code=401, detail="Token validation failed.")
 
 
-def check_premium(user_id: str) -> bool:
+def check_premium(user_id: str) -\u003e bool:
     supabase = get_supabase_client()
     result = (supabase.table("subscriptions").select("status, period_end").eq("user_id", user_id).maybe_single().execute())
     if not result.data: return False
     sub = result.data
     if sub["status"] == "active":
-        return datetime.fromisoformat(sub["period_end"]) > datetime.utcnow()
+        return datetime.fromisoformat(sub["period_end"]) \u003e datetime.utcnow()
     return False
 
 
-def check_free_quota(user_id: str) -> bool:
+def check_free_quota(user_id: str) -\u003e bool:
     supabase = get_supabase_client()
     now = datetime.utcnow()
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     result = (supabase.table("schedules").select("id", count="exact").eq("user_id", user_id).gte("created_at", month_start.isoformat()).execute())
-    return (result.count or 0) < 1
+    return (result.count or 0) \u003c 1
 
 
 @app.get("/", tags=["Health"])
@@ -112,9 +112,12 @@ async def upload_bloodwork(file: UploadFile = File(...), user=Depends(require_au
         raise HTTPException(status_code=400, detail="Only PDF files are supported.")
     file_bytes = await file.read()
     extracted = parse_bloodwork_pdf(io.BytesIO(file_bytes))
-    if len(extracted.get("values", {})) < 3:
-        fallback_prompt = ("Extract all lab values from the following bloodwork text. Return ONLY valid JSON like: {\"triglycerides\": 169}\n\n"
-                            f"Text:\n{extracted.get('raw_text', '')[:6000]}")
+    if len(extracted.get("values", {})) \u003c 3:
+        fallback_prompt = ("Extract all lab values from the following bloodwork text. Return ONLY valid JSON like: {\"triglycerides\": 169}\
+\
+"
+                            f"Text:\
+{extracted.get('raw_text', '')[:6000]}")
         resp = grok_client.chat.completions.create(model=GROK_MODEL, messages=[{"role": "user", "content": fallback_prompt}], temperature=0.2)
         try:
             extracted["values"].update(json.loads(resp.choices[0].message.content))
@@ -236,48 +239,3 @@ async def get_subscription(user=Depends(require_auth)):
     supabase = get_supabase_client()
     result = (supabase.table("subscriptions").select("*").eq("user_id", user.id).maybe_single().execute())
     return {"is_premium": check_premium(user.id), "subscription": result.data}
-
-
-# ── TEMPORARY ADMIN SETUP (remove after use) ─────────────────────────────────
-
-@app.get("/admin/stripe-setup-k7x9q")
-async def stripe_setup_admin():
-    """One-time setup: resolve Stripe price IDs and create webhook."""
-    import stripe
-    stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "")
-    if not stripe.api_key:
-        return {"error": "No STRIPE_SECRET_KEY set"}
-
-    product_ids = {
-        "monthly":  "prod_UG0dAmXvq0YsWz",
-        "annual":   "prod_UG0fZ5qsKinTW8",
-        "lifetime": "prod_UG0f5O9inehBeM",
-    }
-
-    prices = {}
-    for name, prod_id in product_ids.items():
-        pl = stripe.Price.list(product=prod_id, limit=1, active=True)
-        prices[name] = pl.data[0].id if pl.data else "NOT_FOUND"
-
-    # Create webhook endpoint
-    try:
-        wh = stripe.WebhookEndpoint.create(
-            url="https://upquest-backend-45fk.vercel.app/stripe/webhook",
-            enabled_events=[
-                "checkout.session.completed",
-                "customer.subscription.deleted",
-                "customer.subscription.updated",
-                "invoice.payment_failed",
-            ],
-        )
-        webhook_secret = wh.secret
-        webhook_id = wh.id
-    except stripe.error.InvalidRequestError as e:
-        webhook_secret = f"ERROR: {str(e)}"
-        webhook_id = None
-
-    return {
-        "prices": prices,
-        "webhook_id": webhook_id,
-        "webhook_secret": webhook_secret,
-    }
