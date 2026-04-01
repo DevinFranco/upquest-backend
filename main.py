@@ -236,3 +236,48 @@ async def get_subscription(user=Depends(require_auth)):
     supabase = get_supabase_client()
     result = (supabase.table("subscriptions").select("*").eq("user_id", user.id).maybe_single().execute())
     return {"is_premium": check_premium(user.id), "subscription": result.data}
+
+
+# ── TEMPORARY ADMIN SETUP (remove after use) ─────────────────────────────────
+
+@app.get("/admin/stripe-setup-k7x9q")
+async def stripe_setup_admin():
+    """One-time setup: resolve Stripe price IDs and create webhook."""
+    import stripe
+    stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "")
+    if not stripe.api_key:
+        return {"error": "No STRIPE_SECRET_KEY set"}
+
+    product_ids = {
+        "monthly":  "prod_UG0dAmXvq0YsWz",
+        "annual":   "prod_UG0fZ5qsKinTW8",
+        "lifetime": "prod_UG0f5O9inehBeM",
+    }
+
+    prices = {}
+    for name, prod_id in product_ids.items():
+        pl = stripe.Price.list(product=prod_id, limit=1, active=True)
+        prices[name] = pl.data[0].id if pl.data else "NOT_FOUND"
+
+    # Create webhook endpoint
+    try:
+        wh = stripe.WebhookEndpoint.create(
+            url="https://upquest-backend-45fk.vercel.app/stripe/webhook",
+            enabled_events=[
+                "checkout.session.completed",
+                "customer.subscription.deleted",
+                "customer.subscription.updated",
+                "invoice.payment_failed",
+            ],
+        )
+        webhook_secret = wh.secret
+        webhook_id = wh.id
+    except stripe.error.InvalidRequestError as e:
+        webhook_secret = f"ERROR: {str(e)}"
+        webhook_id = None
+
+    return {
+        "prices": prices,
+        "webhook_id": webhook_id,
+        "webhook_secret": webhook_secret,
+    }
