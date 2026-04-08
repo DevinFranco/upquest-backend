@@ -34,7 +34,7 @@ app = FastAPI(
     title="UpQuest API",
     description="AI-powered health routine generator",
     version="1.0.0",
-
+)
 
 app.add_middleware(
     CORSMiddleware,
