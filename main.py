@@ -20,7 +20,7 @@ from supabase_client import get_supabase_client
 try:
     from pdf_parser import parse_bloodwork_pdf
 except Exception:
-    def parse_bloodwork_pdf(*a, **kw): return {
+    def parse_bloodwork_pdf(*a, **kw): return {}
 from schedule_generator import build_schedule_prompt, parse_schedule_response
 from models import (
     UserStats,
