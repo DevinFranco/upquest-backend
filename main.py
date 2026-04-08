@@ -1,5 +1,5 @@
 """
-UpQuest â AI-Powered Health \u0026 Routine App
+UpQuest â AI-Powered Health & Routine App
 Backend: FastAPI (Python 3.12)
 LLM: xAI Grok API (OpenAI-compatible)
 DB/Auth/Storage: Supabase
@@ -20,7 +20,7 @@ from supabase_client import get_supabase_client
 try:
     from pdf_parser import parse_bloodwork_pdf
 except Exception:
-    def parse_bloodwork_pdf(*a, **kw): return {}
+    def parse_bloodwork_pdf(*a, **kw): return {
 from schedule_generator import build_schedule_prompt, parse_schedule_response
 from models import (
     UserStats,
@@ -34,7 +34,7 @@ app = FastAPI(
     title="UpQuest API",
     description="AI-powered health routine generator",
     version="1.0.0",
-)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -70,22 +70,22 @@ def require_auth(authorization: str = Header(...)):
         raise HTTPException(status_code=401, detail="Token validation failed.")
 
 
-def check_premium(user_id: str) -\u003e bool:
+def check_premium(user_id: str) -> bool:
     supabase = get_supabase_client()
     result = (supabase.table("subscriptions").select("status, period_end").eq("user_id", user_id).maybe_single().execute())
     if not result.data: return False
     sub = result.data
     if sub["status"] == "active":
-        return datetime.fromisoformat(sub["period_end"]) \u003e datetime.utcnow()
+        return datetime.fromisoformat(sub["period_end"]) > datetime.utcnow()
     return False
 
 
-def check_free_quota(user_id: str) -\u003e bool:
+def check_free_quota(user_id: str) -> bool:
     supabase = get_supabase_client()
     now = datetime.utcnow()
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     result = (supabase.table("schedules").select("id", count="exact").eq("user_id", user_id).gte("created_at", month_start.isoformat()).execute())
-    return (result.count or 0) \u003c 1
+    return (result.count or 0) < 1
 
 
 @app.get("/", tags=["Health"])
@@ -116,7 +116,7 @@ async def upload_bloodwork(file: UploadFile = File(...), user=Depends(require_au
         raise HTTPException(status_code=400, detail="Only PDF files are supported.")
     file_bytes = await file.read()
     extracted = parse_bloodwork_pdf(io.BytesIO(file_bytes))
-    if len(extracted.get("values", {})) \u003c 3:
+    if len(extracted.get("values", {})) < 3:
         fallback_prompt = ("Extract all lab values from the following bloodwork text. Return ONLY valid JSON like: {\"triglycerides\": 169}\
 \
 "
