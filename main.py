@@ -12,7 +12,8 @@ import json
 import os
 import uuid
 import io
-from typing import Optional
+from typing import Optional, List, Dict, Any
+from pydantic import BaseModel
 from datetime import date, datetime
 
 from supabase_client import get_supabase_client
