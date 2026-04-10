@@ -23,6 +23,7 @@ def build_schedule_prompt(
     goals: List[str],
     bloodwork: Optional[Dict[str, Any]],
     week_start: str,
+    health_data: Optional[str] = None,
 ) -> str:
     """
     Build the master UpQuest prompt for Grok.
@@ -94,6 +95,8 @@ OUTPUT FORMAT: Respond with ONLY a valid JSON object matching this EXACT structu
 
 Be extremely specific with foods, exercises, and times. Personalize every detail.
 """
+    if health_data:
+              prompt += f"\n\n## Real-Time Apple Health & Watch Data\nThe following was synced from the user's iPhone/Apple Watch seconds ago:\n{health_data}\n\nUse this data to personalize the plan: low HRV or high resting HR = add recovery. Sleep < 6h = reduce intensity. VO2 Max = calibrate cardio zones. High step count = already active baseline."
     return prompt.strip()
 
 

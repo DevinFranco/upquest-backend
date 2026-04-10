@@ -262,7 +262,8 @@ class PlanChatRequest(BaseModel):
     goals: List[str] = []
     action: str = "chat"   # "chat" | "generate" | "modify"
     current_plan: Any = None
-
+    labs: Any = None
+    health_data: Optional[str] = None
 
 @app.post("/plan-chat", tags=["Plan"])
 async def plan_chat(payload: PlanChatRequest):
@@ -275,6 +276,7 @@ async def plan_chat(payload: PlanChatRequest):
             goals=payload.goals,
             bloodwork=None,
             week_start=week_start,
+            health_data=payload.health_data,
         )
         if payload.action == "modify" and payload.current_plan:
             prompt += (
