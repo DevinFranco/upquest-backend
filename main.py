@@ -288,6 +288,7 @@ async def plan_chat(payload: PlanChatRequest):
         response = grok_client.chat.completions.create(
             model=GROK_MODEL,
             temperature=0.7,
+            max_tokens=8000,
             messages=messages_for_grok,
         )
         raw = response.choices[0].message.content
