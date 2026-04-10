@@ -78,7 +78,7 @@ OUTPUT FORMAT: Respond with ONLY a valid JSON object matching this EXACT structu
         "dinner": {{"name": "...", "ingredients": ["..."], "macros": {{"protein_g": 0, "carbs_g": 0, "fat_g": 0, "calories": 0}}}},
         "snacks": ["..."]
       }},
-      "workout": {{"type": "...", "duration_minutes": 45, "exercises": [{"name": "...", "sets": 4, "reps": "8-10", "rest_seconds": 90}]}},
+      "workout": {{"type": "...", "duration_minutes": 45, "exercises": [{{"name": "...", "sets": 4, "reps": "8-10", "rest_seconds": 90}}]}},
       "habits": ["Take vitamin D3 (5000 IU)", "Journal 3 gratitudes"],
       "skin_routine": {{"morning": "...", "evening": "..."}},
       "daily_tip": "Science-backed tip personalized to their goals/labs"
