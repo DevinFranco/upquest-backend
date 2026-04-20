@@ -97,9 +97,9 @@ OUTPUT FORMAT: Respond with ONLY a valid JSON object matching this EXACT structu
 Be extremely specific with foods, exercises, and times. Personalize every detail.
 """
     if health_data:
-              prompt += f"\n\n## Real-Time Apple Health & Watch Data\nThe following was synced from the user's iPhone/Apple Watch seconds ago:\n{health_data}\n\nUse this data to personalize the plan: low HRV or high resting HR = add recovery. Sleep < 6h = reduce intensity. VO2 Max = calibrate cardio zones. High step count = already active baseline."
-                if routine_data:
-                        prompt += f"\n\n## User's Weekly Routine & Lifestyle\nThe following describes how the user lives their life this week:\n{routine_data}\n\nSchedule workouts around their work days and commute. Respect their wake/bedtime for scheduling. Account for high-stress or energy-depleted weeks with reduced intensity. Keep appointment and travel days lighter."
+        prompt += f"\n\n## Real-Time Apple Health & Watch Data\nThe following was synced from the user's iPhone/Apple Watch seconds ago:\n{health_data}\n\nUse this data to personalize the plan: low HRV or high resting HR = add recovery. Sleep < 6h = reduce intensity. VO2 Max = calibrate cardio zones. High step count = already active baseline."
+    if routine_data:
+        prompt += f"\n\n## User's Weekly Routine & Lifestyle\nThe following describes how the user lives their life this week:\n{routine_data}\n\nSchedule workouts around their work days and commute. Respect their wake/bedtime for scheduling. Account for high-stress or energy-depleted weeks with reduced intensity. Keep appointment and travel days lighter."
     return prompt.strip()
 
 
