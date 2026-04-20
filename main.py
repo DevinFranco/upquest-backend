@@ -286,7 +286,7 @@ async def plan_chat(payload: PlanChatRequest):
                 "conversation. Return the same JSON structure.\n"
                 + json.dumps(payload.current_plan)
             )
-    messages_for_grok = [{"role": "system", "content": prompt}] + [
+        messages_for_grok = [{"role": "system", "content": prompt}] + [
             {"role": m.role, "content": m.content} for m in payload.messages
         ]
         response = grok_client.chat.completions.create(
