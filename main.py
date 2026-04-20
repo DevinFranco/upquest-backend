@@ -356,7 +356,7 @@ async def plan_chat(payload: PlanChatRequest):
         "Acknowledge what the user shared before asking the next question. "
         "After 3-4 exchanges, tell them you have enough info and they can tap Generate."
     )
-        messages_for_grok = [{"role": "system", "content": system_prompt}] + [
+    messages_for_grok = [{"role": "system", "content": system_prompt}] + [
         {"role": m.role, "content": m.content} for m in payload.messages
     ]
     response = grok_client.chat.completions.create(
