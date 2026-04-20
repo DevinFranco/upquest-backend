@@ -313,11 +313,22 @@ async def plan_chat(payload: PlanChatRequest):
             "— you already have that data. Focus ONLY on: eating habits, food preferences, "
             "stress levels, work schedule/availability, and specific health goals."
         )
+        gather_focus = (
+            "Focus ONLY on what you cannot see in the health data: eating habits, "
+            "food preferences, stress & energy levels, work schedule, and health goals."
+        )
+    else:
+        health_context = ""
+        gather_focus = (
+            "Gather info about: sleep quality, daily activity level, eating habits, "
+            "stress levels, work schedule, and specific health goals."
+        )
+
     system_prompt = (
         "You are an expert AI health coach having a warm, concise conversation "
         "to understand the user's lifestyle so you can build a personalized Quest. "
         + health_context
-        + "\n\nFocus on: eating habits, stress levels, work schedule, and health goals. "
+        + "\n\n" + gather_focus + " "
         "Keep each response SHORT — 2 to 4 sentences max. Be conversational and warm. "
         "Acknowledge what the user shared before asking the next question. "
         "After 3-4 exchanges, tell them you have enough info and they can tap Generate."
