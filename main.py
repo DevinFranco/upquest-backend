@@ -304,16 +304,25 @@ async def plan_chat(payload: PlanChatRequest):
         return {"message": f"Your plan is {label}!", "schedule": schedule}
 
     # ── Chat mode ────────────────────────────────────────────────────────────
+    health_context = ""
+    if payload.health_data:
+        health_context = (
+            "\n\nYou already have this Apple Health & Watch data for the user:\n"
+            + payload.health_data
+            + "\n\nCRITICAL: Do NOT ask about sleep, steps, heart rate, HRV, or workouts "
+            "— you already have that data. Focus ONLY on: eating habits, food preferences, "
+            "stress levels, work schedule/availability, and specific health goals."
+        )
     system_prompt = (
         "You are an expert AI health coach having a warm, concise conversation "
-        "to understand the user's lifestyle so you can build a personalized health plan. "
-        "Gather info about: sleep quality, daily activity level, diet/eating habits, "
-        "stress levels, and specific health goals. "
+        "to understand the user's lifestyle so you can build a personalized Quest. "
+        + health_context
+        + "\n\nFocus on: eating habits, stress levels, work schedule, and health goals. "
         "Keep each response SHORT — 2 to 4 sentences max. Be conversational and warm. "
         "Acknowledge what the user shared before asking the next question. "
-        "After 3-4 exchanges tell them you have enough info and they can tap Generate."
+        "After 3-4 exchanges, tell them you have enough info and they can tap Generate."
     )
-    messages_for_grok = [{"role": "system", "content": system_prompt}] + [
+        messages_for_grok = [{"role": "system", "content": system_prompt}] + [
         {"role": m.role, "content": m.content} for m in payload.messages
     ]
     response = grok_client.chat.completions.create(
