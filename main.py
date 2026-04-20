@@ -275,7 +275,7 @@ async def plan_chat(payload: PlanChatRequest):
         prompt = build_schedule_prompt(
             stats=payload.stats,
             goals=payload.goals,
-            bloodwork=None,
+            bloodwork=payload.labs,
             week_start=week_start,
             health_data=payload.health_data,
                     routine_data=payload.routine_data,
@@ -304,6 +304,28 @@ async def plan_chat(payload: PlanChatRequest):
         return {"message": f"Your plan is {label}!", "schedule": schedule}
 
     # ── Chat mode ────────────────────────────────────────────────────────────
+    # ── Labs / bloodwork context
+    labs_context = ""
+    if payload.labs:
+        labs_str = str(payload.labs) if not isinstance(payload.labs, str) else payload.labs
+        labs_context = (
+            "\n\nYou also have bloodwork/lab results for this user:\n"
+            + labs_str
+            + "\n\nReview every marker and proactively acknowledge any that are outside\n"
+            "healthy ranges. This includes (but is not limited to):\n"
+            "- Lipids: high LDL, low HDL, high triglycerides\n"
+            "- Blood sugar: elevated glucose, HbA1c (pre-diabetes/diabetes)\n"
+            "- Thyroid: abnormal TSH, T3, T4\n"
+            "- Vitamins/minerals: low vitamin D, B12, folate, iron, ferritin\n"
+            "- Inflammation: high CRP, homocysteine\n"
+            "- Liver/kidney: elevated ALT, AST, creatinine\n"
+            "- Hormones: low testosterone, cortisol imbalance\n"
+            "For each flagged marker, ask a targeted follow-up question about the diet\n"
+            "or lifestyle habit most relevant to improving it. Reference the specific\n"
+            "value (e.g. LDL 158 mg/dL). Use ALL flagged markers to shape the Quest:\n"
+            "exercise type, intensity, diet focus, recovery, and supplement notes."
+        )
+
     health_context = ""
     if payload.health_data:
         health_context = (
@@ -328,6 +350,7 @@ async def plan_chat(payload: PlanChatRequest):
         "You are an expert AI health coach having a warm, concise conversation "
         "to understand the user's lifestyle so you can build a personalized Quest. "
         + health_context
+        + labs_context
         + "\n\n" + gather_focus + " "
         "Keep each response SHORT — 2 to 4 sentences max. Be conversational and warm. "
         "Acknowledge what the user shared before asking the next question. "
