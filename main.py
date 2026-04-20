@@ -16,7 +16,7 @@ from typing import Optional, List, Dict, Any
 from pydantic import BaseModel
 from datetime import date, datetime
 
-from supabase_client import get_supabase_client
+from supabase_client import get_supabase_clien
 try:
     from pdf_parser import parse_bloodwork_pdf
 except Exception:
