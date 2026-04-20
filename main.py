@@ -16,7 +16,7 @@ from typing import Optional, List, Dict, Any
 from pydantic import BaseModel
 from datetime import date, datetime
 
-from supabase_client import get_supabase_clien
+from supabase_client import get_supabase_client
 try:
     from pdf_parser import parse_bloodwork_pdf
 except Exception:
@@ -349,7 +349,7 @@ async def plan_chat(payload: PlanChatRequest):
     system_prompt = (
         "You are an expert AI health coach having a warm, concise conversation "
         "to understand the user's lifestyle so you can build a personalized Quest. "
-        + health_context
+        + health_contex
         + labs_context
         + "\n\n" + gather_focus + " "
         "Keep each response SHORT Ã¢ÂÂ 2 to 4 sentences max. Be conversational and warm. "
@@ -357,7 +357,7 @@ async def plan_chat(payload: PlanChatRequest):
         "After 3-4 exchanges, tell them you have enough info and they can tap Generate."
     )
     messages_for_grok = [{"role": "system", "content": system_prompt}] + [
-        {"role": m.role, "content": m.content} for m in payload.messages
+    {"role": m.role, "content": m.content} for m in payload.messages
     ]
     response = grok_client.chat.completions.create(
         model=GROK_MODEL,
