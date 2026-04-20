@@ -1,5 +1,5 @@
 """
-UpQuest â AI-Powered Health & Routine App
+UpQuest Ã¢ÂÂ AI-Powered Health & Routine App
 Backend: FastAPI (Python 3.12)
 LLM: xAI Grok API (OpenAI-compatible)
 DB/Auth/Storage: Supabase
@@ -90,7 +90,7 @@ def check_free_quota(user_id: str) -> bool:
 
 @app.get("/", tags=["Health"])
 def root():
-    return {"status": "UpQuest API is live ð", "version": "1.0.0"}
+    return {"status": "UpQuest API is live Ã°ÂÂÂ", "version": "1.0.0"}
 
 
 @app.post("/profile", tags=["User"])
@@ -154,7 +154,7 @@ async def generate_schedule(payload: ScheduleRequest, user=Depends(require_auth)
         if bw.data: payload.bloodwork_summary = bw.data["extracted_data"].get("values", {})
     prompt = build_schedule_prompt(stats=payload.stats.dict(), goals=payload.goals, bloodwork=payload.bloodwork_summary, week_start=payload.week_start or str(date.today()))
     response = grok_client.chat.completions.create(model=GROK_MODEL, temperature=0.7, max_tokens=8000,
-        messages=[{"role": "system", "content": "You are UpQuest AI â an expert health caretaker. Always respond with ONLY valid JSON. No markdown, no prose."},
+        messages=[{"role": "system", "content": "You are UpQuest AI Ã¢ÂÂ an expert health caretaker. Always respond with ONLY valid JSON. No markdown, no prose."},
         {"role": "user", "content": prompt}])
     raw = response.choices[0].message.content.strip()
     if raw.startswith("```"):
@@ -204,7 +204,7 @@ async def export_ical(schedule_id: str, user=Depends(require_auth)):
             try: hour, minute = _parse_time(time_slot)
             except: continue
             event = ICalEvent()
-            event.add("summary", f"UpQuest â {activity[:60]}")
+            event.add("summary", f"UpQuest Ã¢ÂÂ {activity[:60]}")
             event.add("dtstart", datetime(day_date.year, day_date.month, day_date.day, hour, minute))
             event.add("dtend", datetime(day_date.year, day_date.month, day_date.day, hour, minute) + timedelta(minutes=30))
             event.add("description", activity)
@@ -243,14 +243,14 @@ async def get_subscription(user=Depends(require_auth)):
     supabase = get_supabase_client()
     result = (supabase.table("subscriptions").select("*").eq("user_id", user.id).maybe_single().execute())
     return {"is_premium": check_premium(user.id), "subscription": result.data}
-# ─────────────────────────────────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 # PASTE THIS AT THE VERY BOTTOM OF main.py IN GITHUB, THEN COMMIT
 # Also update the "from typing import Optional" line to add: List, Dict, Any
 # And add "from pydantic import BaseModel" after the existing imports if missing
-# ─────────────────────────────────────────────────────────────────────────────
+# âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 
-# ── Plan Chat (no auth required) ─────────────────────────────────────────────
+# ââ Plan Chat (no auth required) âââââââââââââââââââââââââââââââââââââââââââââ
 
 class PlanChatMessage(BaseModel):
     role: str
@@ -264,11 +264,11 @@ class PlanChatRequest(BaseModel):
     current_plan: Any = None
     labs: Any = None
     health_data: Optional[str] = None
-        routine_data: Optional[str] = None
+    routine_data: Optional[str] = None
 
 @app.post("/plan-chat", tags=["Plan"])
 async def plan_chat(payload: PlanChatRequest):
-    """AI health coach — no auth required. Chat or generate a plan."""
+    """AI health coach â no auth required. Chat or generate a plan."""
 
     if payload.action in ("generate", "modify"):
         week_start = str(date.today())
@@ -303,8 +303,8 @@ async def plan_chat(payload: PlanChatRequest):
         label = "updated" if payload.action == "modify" else "ready"
         return {"message": f"Your plan is {label}!", "schedule": schedule}
 
-    # ── Chat mode ────────────────────────────────────────────────────────────
-    # ── Labs / bloodwork context
+    # ââ Chat mode ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+    # ââ Labs / bloodwork context
     labs_context = ""
     if payload.labs:
         labs_str = str(payload.labs) if not isinstance(payload.labs, str) else payload.labs
@@ -332,7 +332,7 @@ async def plan_chat(payload: PlanChatRequest):
             "\n\nYou already have this Apple Health & Watch data for the user:\n"
             + payload.health_data
             + "\n\nCRITICAL: Do NOT ask about sleep, steps, heart rate, HRV, or workouts "
-            "— you already have that data. Focus ONLY on: eating habits, food preferences, "
+            "â you already have that data. Focus ONLY on: eating habits, food preferences, "
             "stress levels, work schedule/availability, and specific health goals."
         )
         gather_focus = (
@@ -352,7 +352,7 @@ async def plan_chat(payload: PlanChatRequest):
         + health_context
         + labs_context
         + "\n\n" + gather_focus + " "
-        "Keep each response SHORT — 2 to 4 sentences max. Be conversational and warm. "
+        "Keep each response SHORT â 2 to 4 sentences max. Be conversational and warm. "
         "Acknowledge what the user shared before asking the next question. "
         "After 3-4 exchanges, tell them you have enough info and they can tap Generate."
     )
