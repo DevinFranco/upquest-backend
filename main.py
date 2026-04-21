@@ -289,7 +289,7 @@ async def plan_chat(payload: PlanChatRequest):
         messages_for_grok = [{"role": "system", "content": prompt}] + [
             {"role": m.role, "content": m.content} for m in payload.messages
         ]
-        response = grok_client.chat.completions.create(
+        response = grok_client.chat.completions.create
             model=GROK_MODEL,
             temperature=0.7,
             max_tokens=8000,
@@ -349,7 +349,7 @@ async def plan_chat(payload: PlanChatRequest):
     system_prompt = (
         "You are an expert AI health coach having a warm, concise conversation "
         "to understand the user's lifestyle so you can build a personalized Quest. "
-        + health_contex
+        + health_context
         + labs_context
         + "\n\n" + gather_focus + " "
         "Keep each response SHORT Ã¢ÂÂ 2 to 4 sentences max. Be conversational and warm. "
