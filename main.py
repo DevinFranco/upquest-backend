@@ -289,7 +289,7 @@ async def plan_chat(payload: PlanChatRequest):
         messages_for_grok = [{"role": "system", "content": prompt}] + [
             {"role": m.role, "content": m.content} for m in payload.messages
         ]
-        response = grok_client.chat.completions.create
+        response = grok_client.chat.completions.create(
             model=GROK_MODEL,
             temperature=0.7,
             max_tokens=8000,
